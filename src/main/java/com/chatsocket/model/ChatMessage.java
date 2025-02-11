@@ -24,7 +24,6 @@ public class ChatMessage {
         this.timestamp = timestamp;
     }
 
-    // Getters and Setters
 
     public String getId() {
         return id;
