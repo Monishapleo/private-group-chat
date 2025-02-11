@@ -23,11 +23,11 @@ public class ChatController {
         this.chatMessageRepository = chatMessageRepository;
         this.chatService = chatService;
     }
-    @MessageMapping("/send")
+    /*@MessageMapping("/send")
     @SendTo("/topic/messages")
     public ChatMessage sendMessage(ChatMessage message) {
         return message;
-    }
+    }*/
 
     @GetMapping("/{user}")
     public List<ChatMessage> getUserChats(@PathVariable String user) {
