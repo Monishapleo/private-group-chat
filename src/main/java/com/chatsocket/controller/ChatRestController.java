@@ -1,31 +1,41 @@
 package com.chatsocket.controller;
 
-import com.chatsocket.model.ChatMessage;
-import com.chatsocket.service.ChatService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.chatsocket.config.GroupChatHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chat")
 public class ChatRestController {
 
-    private final ChatService chatService;
+    private final GroupChatHandler groupChatHandler;
 
-    public ChatRestController(ChatService chatService) {
-        this.chatService = chatService;
+    @Autowired
+    public ChatRestController(GroupChatHandler groupChatHandler) {
+        this.groupChatHandler = groupChatHandler;
     }
 
     @PostMapping("/send")
-    public ResponseEntity<ChatMessage> sendMessage(@RequestBody ChatMessage message) {
-        ChatMessage savedMessage = chatService.saveMessage(message);
-        return ResponseEntity.ok(savedMessage);
-    }
+    public String sendMessage(@RequestBody Map<String, String> request) {
+        String group = request.get("group");
+        String sender = request.get("sender");
+        String message = request.get("message");
 
-    @GetMapping("/{user1}/{user2}")
-    public ResponseEntity<List<ChatMessage>> getChatHistory(@PathVariable String user1, @PathVariable String user2) {
-        List<ChatMessage> chatHistory = chatService.getChatBetweenUsers(user1, user2);
-        return ResponseEntity.ok(chatHistory);
+        if (group == null || sender == null || message == null) {
+            return "Missing required fields!";
+        }
+
+        try {
+            groupChatHandler.sendMessageToGroup(group, sender, message);
+            return "Message sent to group: " + group;
+        } catch (Exception e) {
+            return "Error sending message: " + e.getMessage();
+        }
     }
 }
+
